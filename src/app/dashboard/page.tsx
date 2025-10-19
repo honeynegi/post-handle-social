@@ -15,7 +15,7 @@ export default function Home() {
       {/* Sidebar */}
       <div className="w-64 bg-white shadow-md relative">
         <div className="p-6">
-          <h1 className="text-2xl font-bold text-indigo-600">SocialHub</h1>
+          <h1 className="text-xl font-semibold text-custom-primary">Post handle</h1>
         </div>
 
         <nav className="mt-6">

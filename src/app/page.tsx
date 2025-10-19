@@ -5,6 +5,7 @@ import FeaturesSection from '../components/FeaturesSection';
 import HowItWorksSection from '../components/HowItWorksSection';
 import TestimonialsSection from '../components/TestimonialsSection';
 import PricingSection from '../components/PricingSection';
+import Button from '../components/Button';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaPinterest, FaYoutube, FaTiktok } from 'react-icons/fa';
 
 export default function Home() {
@@ -25,8 +26,12 @@ export default function Home() {
                   Save time and grow your business. Schedule posts, analyze performance, and engage with your audience across all social platforms.
                 </p>
                 <div className="flex space-x-4">
-                  <a href="#" className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition">Start Free Trial</a>
-                  <a href="#" className="border border-gray-300 hover:border-gray-400 text-gray-700 font-bold py-3 px-6 rounded-lg text-lg transition">Watch Demo</a>
+                  <Button variant="primary" size="lg" href="#" pill>
+                    Start Free Trial
+                  </Button>
+                  <Button variant="outline" size="lg" href="#" pill>
+                    Watch Demo
+                  </Button>
                 </div>
               </div>
               <div className="md:w-1/2 mt-10 md:mt-0 md:pl-12">
@@ -62,11 +67,17 @@ export default function Home() {
         <PricingSection />
 
         {/* Final CTA Section */}
-        <section className="py-20 bg-indigo-600">
-          <div className="container mx-auto px-6 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Ready to Get Started?</h2>
-            <p className="text-xl text-indigo-200 mb-8">Join thousands of businesses saving time with Post-Bridge.</p>
-            <a href="#" className="bg-white hover:bg-gray-100 text-indigo-600 font-bold py-3 px-8 rounded-lg text-lg transition">Start Your Free Trial</a>
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-6">
+            <div className="max-w-7xl mx-auto">
+              <div className="bg-gradient-to-br from-gray-100/70 via-custom-primary/5 to-gray-100/70 rounded-3xl p-12 md:p-16 text-center">
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Ready to Get <span className="text-custom-secondary">Started</span>?</h2>
+                <p className="text-xl text-gray-600 mb-8">Join thousands of businesses saving time with Post-Handle.</p>
+                <Button variant="primary" size="lg" href="#" pill>
+                  Start Your Free Trial
+                </Button>
+              </div>
+            </div>
           </div>
         </section>
       </main>

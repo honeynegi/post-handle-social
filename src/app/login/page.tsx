@@ -57,6 +57,10 @@ export default function Login() {
     setLoading(true)
     setError('')
 
+    const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL 
+      ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+      : `${window.location.origin}/auth/callback`
+
     try {
       if (usePassword) {
         if (!password) {
@@ -78,7 +82,7 @@ export default function Login() {
         const { error } = await supabase.auth.signInWithOtp({
           email,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            emailRedirectTo: redirectUrl,
           },
         })
 
@@ -89,9 +93,7 @@ export default function Login() {
         }
       }
 
-      // Reset CAPTCHA after successful submission
-      setCaptchaToken(null)
-      turnstileRef.current?.reset()
+      // Note: CAPTCHA is not reset here to allow reuse
 
     } catch (err) {
       setError('An unexpected error occurred')
@@ -132,9 +134,7 @@ export default function Login() {
         router.push(`/auth/signup-success?email=${encodeURIComponent(email)}`)
       }
 
-      // Reset CAPTCHA after successful submission
-      setCaptchaToken(null)
-      turnstileRef.current?.reset()
+      // Note: CAPTCHA is not reset here to allow reuse
 
     } catch (err) {
       setError('An unexpected error occurred')
@@ -276,6 +276,7 @@ export default function Login() {
         {/* Cloudflare Verification */}
         <div className="mb-8 flex justify-center">
           <Turnstile
+            key={activeTab}
             ref={turnstileRef}
             onSuccess={handleCaptchaSuccess}
             onError={handleCaptchaError}

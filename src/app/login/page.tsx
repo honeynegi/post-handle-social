@@ -5,6 +5,7 @@ import { use, useState } from 'react'
 import { FaArrowLeft, FaComment } from 'react-icons/fa'
 import { FcGoogle } from 'react-icons/fc'
 import Button from '../../components/Button'
+import { createClient } from '../../utils/supabase/client'
 
 export default function Login() {
   const [activeTab, setActiveTab] = useState('signin')
@@ -12,7 +13,112 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [email, setEmail] = useState('')
   const [username, setUsername] = useState('')
-  const router = useRouter();
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const router = useRouter()
+  const supabase = createClient()
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true)
+    setError('')
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+
+      if (error) {
+        setError(error.message)
+      }
+    } catch (err) {
+      setError('An unexpected error occurred')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleEmailSignIn = async () => {
+    if (!email) {
+      setError('Email is required')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+
+    try {
+      if (usePassword) {
+        if (!password) {
+          setError('Password is required')
+          return
+        }
+
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        })
+
+        if (error) {
+          setError(error.message)
+        } else {
+          router.push('/dashboard')
+        }
+      } else {
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
+          },
+        })
+
+        if (error) {
+          setError(error.message)
+        } else {
+          setError('Check your email for the magic link!')
+        }
+      }
+    } catch (err) {
+      setError('An unexpected error occurred')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSignUp = async () => {
+    if (!email || !password || !username) {
+      setError('All fields are required')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username,
+          },
+        },
+      })
+
+      if (error) {
+        setError(error.message)
+      } else {
+        // Redirect to success page with email parameter
+        router.push(`/auth/signup-success?email=${encodeURIComponent(email)}`)
+      }
+    } catch (err) {
+      setError('An unexpected error occurred')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
@@ -42,7 +148,10 @@ export default function Login() {
           <Button
             variant={activeTab === 'signup' ? 'primary' : 'ghost'}
             className={`flex-1 ${activeTab === 'signup' ? 'bg-custom-secondary hover:bg-custom-secondary/90 text-white' : 'bg-transparent text-gray-700 hover:bg-gray-100'}`}
-            onClick={() => setActiveTab('signup')}
+            onClick={() => {
+              setError('')
+              setActiveTab('signup')
+            }}
           >
             Sign Up
           </Button>
@@ -59,20 +168,33 @@ export default function Login() {
         </div>
 
         {/* Google Sign In Button */}
-        <button className="w-full flex items-center justify-center bg-white border border-gray-300 rounded-lg py-3 px-4 hover:bg-gray-50 transition-colors mb-6">
+        {/* <button
+          onClick={handleGoogleSignIn}
+          disabled={loading}
+          className="w-full flex items-center justify-center bg-white border border-gray-300 rounded-lg py-3 px-4 hover:bg-gray-50 transition-colors mb-6 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           <FcGoogle className="w-5 h-5 mr-3" />
-          <span className="text-gray-700 font-medium">Continue with Google</span>
-        </button>
+          <span className="text-gray-700 font-medium">
+            {loading ? 'Loading...' : 'Continue with Google'}
+          </span>
+        </button> */}
 
         {/* OR Separator */}
-        <div className="relative my-8">
+        {/* <div className="relative my-8">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-300"></div>
           </div>
           <div className="relative flex justify-center text-sm">
             <span className="px-2 bg-white text-gray-500">OR</span>
           </div>
-        </div>
+        </div> */}
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-600 text-sm">{error}</p>
+          </div>
+        )}
 
         {/* Email Input */}
         <div className="mb-6">
@@ -81,7 +203,7 @@ export default function Login() {
             placeholder="Enter your email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-gray-300"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-gray-300 text-black"
           />
         </div>
 
@@ -93,7 +215,7 @@ export default function Login() {
               placeholder="Choose a username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-gray-300"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-gray-300 text-black"
             />
           </div>
         )}
@@ -106,7 +228,7 @@ export default function Login() {
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-gray-300"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-gray-300 text-black"
             />
           </div>
         )}
@@ -123,23 +245,25 @@ export default function Login() {
           </label>
         </div>
 
-        {/* Action Buttons */}
+                {/* Action Buttons */}
         {activeTab === 'signup' ? (
           <>
             <Button
               variant="primary"
               fullWidth
               className="text-white mb-6 font-semibold"
-              onClick={() => {}}
+              onClick={handleSignUp}
+              disabled={loading}
             >
-              Create account
+              {loading ? 'Creating account...' : 'Create account'}
             </Button>
             <div className="text-center text-sm text-gray-600 mb-0">
-              Already have an account?
+              Already have an account?{' '}
               <Button
                 variant="link"
                 className="text-custom-secondary hover:text-custom-secondary/80 p-0 h-auto font-medium"
                 onClick={() => setActiveTab('signin')}
+                disabled={loading}
               >
                 Sign in
               </Button>
@@ -151,15 +275,17 @@ export default function Login() {
               variant="primary"
               fullWidth
               className="text-white mb-6 font-semibold"
-              onClick={() => setUsePassword(false)}
+              onClick={handleEmailSignIn}
+              disabled={loading}
             >
-              {usePassword ? 'Sign In' : 'Send Magic Link'}
+              {loading ? 'Signing in...' : (usePassword ? 'Sign In' : 'Send Magic Link')}
             </Button>
             <Button
               variant="outline"
               fullWidth
               className="bg-white border-none hover:bg-custom-secondary text-gray-700 mb-6 font-semibold"
               onClick={() => setUsePassword(v => !v)}
+              disabled={loading}
             >
               {usePassword ? 'Send Magic Link' : 'Use password'}
             </Button>

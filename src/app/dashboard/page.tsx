@@ -1,13 +1,62 @@
 'use client'
 
-import { useState } from 'react'
-import { FaHome, FaEdit, FaFileAlt, FaCog, FaUser, FaImage, FaVideo, FaFacebookF, FaTwitter, FaInstagram, FaLinkedin, FaYoutube, FaChevronDown } from 'react-icons/fa'
+import { useState, useEffect, useRef } from 'react'
+import { FaHome, FaEdit, FaFileAlt, FaCog, FaUser, FaImage, FaVideo, FaFacebookF, FaTwitter, FaInstagram, FaLinkedin, FaYoutube, FaChevronDown, FaSignOutAlt } from 'react-icons/fa'
+import { createClient } from '../../utils/supabase/client'
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
   const [selectedType, setSelectedType] = useState<string | null>(null)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const userMenuRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+  const supabase = createClient()
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser()
+        if (error) {
+          console.error('Error fetching user:', error)
+          router.push('/login')
+          return
+        }
+        setUser(user)
+      } catch (error) {
+        console.error('Error:', error)
+        router.push('/login')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    getUser()
+  }, [supabase, router])
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   const selectPostType = (type: string) => {
     setSelectedType(type)
+  }
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push('/login')
   }
 
   return (
@@ -23,7 +72,7 @@ export default function Home() {
             <FaHome className="mr-3 h-5 w-5" />
             <span>Dashboard</span>
           </a>
-          <a href="#" className="sidebar-item active flex items-center px-6 py-3 text-gray-700 bg-indigo-50 text-indigo-600 border-r-4 border-indigo-600">
+          <a href="#" className="sidebar-item active flex items-center px-6 py-3 bg-indigo-50 text-indigo-600 border-r-4 border-indigo-600">
             <FaEdit className="mr-3 h-5 w-5" />
             <span>Create post</span>
           </a>
@@ -38,15 +87,52 @@ export default function Home() {
         </nav>
 
         <div className="absolute bottom-0 w-64 p-6 border-t">
-          <div className="flex items-center">
-            <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white">
-              <FaUser />
-            </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-gray-700">John Doe</p>
-              <p className="text-xs text-gray-500">john@example.com</p>
-            </div>
-            <FaChevronDown className="ml-auto text-gray-400" />
+          <div className="relative" ref={userMenuRef}>
+            <button
+              onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+              className="w-full flex items-center hover:bg-gray-50 rounded-lg p-2 transition-colors"
+              disabled={loading}
+            >
+              <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white">
+                {loading ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <FaUser />
+                )}
+              </div>
+              <div className="ml-3 flex-1 text-left">
+                <p className="text-sm font-medium text-gray-700">
+                  {loading ? 'Loading...' : user?.user_metadata?.username || user?.email?.split('@')[0] || 'User'}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {loading ? '' : user?.email || ''}
+                </p>
+              </div>
+              <FaChevronDown className={`text-gray-400 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* User Menu Dropdown */}
+            {isUserMenuOpen && (
+              <div className="absolute bottom-full left-0 right-0 mb-2 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                <div className="p-4 border-b">
+                  <p className="text-sm font-medium text-gray-700">
+                    {loading ? 'Loading...' : user?.user_metadata?.username || user?.email?.split('@')[0] || 'User'}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {loading ? '' : user?.email || ''}
+                  </p>
+                </div>
+                <div className="py-2">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    <FaSignOutAlt className="mr-3 h-4 w-4" />
+                    <span>Logout</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

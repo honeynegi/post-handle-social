@@ -1,11 +1,12 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { use, useState } from 'react'
+import { use, useState, useRef } from 'react'
 import { FaArrowLeft, FaComment } from 'react-icons/fa'
 import { FcGoogle } from 'react-icons/fc'
 import Button from '../../components/Button'
 import { createClient } from '../../utils/supabase/client'
+import Turnstile from '../../components/Turnstile'
 
 export default function Login() {
   const [activeTab, setActiveTab] = useState('signin')
@@ -15,8 +16,10 @@ export default function Login() {
   const [username, setUsername] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
+  const turnstileRef = useRef<any>(null)
 
   const handleGoogleSignIn = async () => {
     setLoading(true)
@@ -43,6 +46,11 @@ export default function Login() {
   const handleEmailSignIn = async () => {
     if (!email) {
       setError('Email is required')
+      return
+    }
+
+    if (!captchaToken) {
+      setError('Please complete the CAPTCHA verification')
       return
     }
 
@@ -80,6 +88,11 @@ export default function Login() {
           setError('Check your email for the magic link!')
         }
       }
+
+      // Reset CAPTCHA after successful submission
+      setCaptchaToken(null)
+      turnstileRef.current?.reset()
+
     } catch (err) {
       setError('An unexpected error occurred')
     } finally {
@@ -90,6 +103,11 @@ export default function Login() {
   const handleSignUp = async () => {
     if (!email || !password || !username) {
       setError('All fields are required')
+      return
+    }
+
+    if (!captchaToken) {
+      setError('Please complete the CAPTCHA verification')
       return
     }
 
@@ -113,11 +131,33 @@ export default function Login() {
         // Redirect to success page with email parameter
         router.push(`/auth/signup-success?email=${encodeURIComponent(email)}`)
       }
+
+      // Reset CAPTCHA after successful submission
+      setCaptchaToken(null)
+      turnstileRef.current?.reset()
+
     } catch (err) {
       setError('An unexpected error occurred')
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleCaptchaSuccess = (token: string) => {
+    setCaptchaToken(token)
+    if (error === 'Please complete the CAPTCHA verification') {
+      setError('')
+    }
+  }
+
+  const handleCaptchaError = () => {
+    setCaptchaToken(null)
+    setError('CAPTCHA verification failed')
+  }
+
+  const handleCaptchaExpire = () => {
+    setCaptchaToken(null)
+    setError('CAPTCHA has expired. Please try again.')
   }
 
   return (
@@ -234,15 +274,13 @@ export default function Login() {
         )}
 
         {/* Cloudflare Verification */}
-        <div className="mb-8">
-          <label className="flex items-start cursor-pointer">
-            <input type="checkbox" className="mt-1 mr-3" defaultChecked />
-            <span className="text-sm text-gray-600">
-              I'm human, not a robot. This site is protected by reCAPTCHA and the Google
-              <a href="#" className="text-blue-600 hover:underline"> Privacy Policy</a> and
-              <a href="#" className="text-blue-600 hover:underline"> Terms of Service</a> apply.
-            </span>
-          </label>
+        <div className="mb-8 flex justify-center">
+          <Turnstile
+            ref={turnstileRef}
+            onSuccess={handleCaptchaSuccess}
+            onError={handleCaptchaError}
+            onExpire={handleCaptchaExpire}
+          />
         </div>
 
                 {/* Action Buttons */}

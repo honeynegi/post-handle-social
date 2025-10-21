@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter, Roboto, Open_Sans, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import { AlertProvider } from "../contexts/AlertContext";
+import { UserProvider } from "../contexts/UserContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -55,7 +57,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${roboto.variable} ${openSans.variable} ${plusJakartaSans.variable} antialiased`}
       >
-        {children}
+        <AlertProvider>
+          <UserProvider>
+            {children}
+          </UserProvider>
+        </AlertProvider>
       </body>
     </html>
   );

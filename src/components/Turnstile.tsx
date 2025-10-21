@@ -11,6 +11,15 @@ interface TurnstileProps {
 
 const Turnstile = forwardRef<any, TurnstileProps>(
   ({ onSuccess, onError, onExpire }, ref) => {
+    // Skip CAPTCHA in development environment
+    if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') {
+      // Automatically call onSuccess with a dummy token for development
+      setTimeout(() => {
+        onSuccess('development-token')
+      }, 100)
+      return null
+    }
+
     return (
       <CloudflareTurnstile
         ref={ref}

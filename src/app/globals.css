@@ -12,6 +12,7 @@
   --color-custom-secondary: #66CC8A;
   --color-custom-text: #333C4D;
   --color-custom-footer: #E8E8E8;
+  --color-custom-error: #FF5861;
   --font-sans: var(--font-plus-jakarta-sans);
   --font-mono: var(--font-geist-mono);
   --font-inter: var(--font-inter);

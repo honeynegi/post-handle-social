@@ -72,15 +72,34 @@ const Button: React.FC<ButtonProps> = ({
   // Base classes
   const baseClasses = 'inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed';
 
-  // Variant classes
-  const variantClasses = {
-    primary: 'bg-custom-secondary hover:opacity-80 text-white shadow-sm',
-    secondary: 'bg-gray-600 hover:bg-gray-700 text-white shadow-sm',
-    outline: 'border border-gray-300 bg-white hover:bg-gray-300 text-gray-700',
-    ghost: 'bg-transparent hover:bg-gray-100 text-gray-700',
-    text: 'bg-transparent hover:bg-gray-100 text-[#343D4E] hover:text-gray-700',
-    link: 'bg-transparent text-custom-primary hover:text-custom-secondary p-0 h-auto',
+  // Variant classes - conditionally remove hover styles if custom hover is provided
+  const getVariantClasses = (variant: ButtonVariant, hasCustomHover: boolean) => {
+    const baseVariants = {
+      primary: 'bg-custom-secondary hover:opacity-80 text-white shadow-sm',
+      secondary: 'bg-gray-600 hover:bg-gray-700 text-white shadow-sm',
+      outline: 'border border-gray-300 bg-white hover:bg-gray-300 text-gray-700',
+      ghost: 'bg-transparent hover:bg-gray-100 text-gray-700',
+      text: 'bg-transparent hover:bg-gray-100 text-[#343D4E] hover:text-gray-700',
+      link: 'bg-transparent text-custom-primary hover:text-custom-secondary p-0 h-auto',
+    };
+
+    if (hasCustomHover) {
+      // Remove hover styles from variants when custom hover is provided
+      return {
+        primary: 'bg-custom-secondary text-white shadow-sm',
+        secondary: 'bg-gray-600 text-white shadow-sm',
+        outline: 'border border-gray-300 bg-white text-gray-700',
+        ghost: 'bg-transparent text-gray-700',
+        text: 'bg-transparent text-[#343D4E]',
+        link: 'bg-transparent text-custom-primary p-0 h-auto',
+      }[variant];
+    }
+
+    return baseVariants[variant];
   };
+
+  const hasCustomHover = className.includes('hover:');
+  const variantClasses = getVariantClasses(variant, hasCustomHover);
 
   // Size classes
   const sizeClasses = {
@@ -101,7 +120,7 @@ const Button: React.FC<ButtonProps> = ({
   const loadingClass = loading ? 'cursor-wait' : '';
 
   // Combine all classes
-  const buttonClasses = `hover:cursor-pointer ${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${pillClass} ${widthClass} ${loadingClass} ${className}`.trim();
+  const buttonClasses = `${baseClasses} ${variantClasses} ${sizeClasses[size]} ${pillClass} ${widthClass} ${loadingClass} hover:cursor-pointer ${className}`.trim();
 
   // If href is provided, render as Link with button inside for onClick support
   if (href) {

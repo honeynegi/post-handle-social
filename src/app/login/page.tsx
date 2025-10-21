@@ -49,7 +49,8 @@ export default function Login() {
       return
     }
 
-    if (!captchaToken) {
+    // Skip CAPTCHA check in development
+    if (process.env.NEXT_PUBLIC_NODE_ENV !== 'development' && !captchaToken) {
       setError('Please complete the CAPTCHA verification')
       return
     }
@@ -108,7 +109,8 @@ export default function Login() {
       return
     }
 
-    if (!captchaToken) {
+    // Skip CAPTCHA check in development
+    if (process.env.NEXT_PUBLIC_NODE_ENV !== 'development' && !captchaToken) {
       setError('Please complete the CAPTCHA verification')
       return
     }
@@ -274,15 +276,17 @@ export default function Login() {
         )}
 
         {/* Cloudflare Verification */}
-        <div className="mb-8 flex justify-center">
-          <Turnstile
-            key={activeTab}
-            ref={turnstileRef}
-            onSuccess={handleCaptchaSuccess}
-            onError={handleCaptchaError}
-            onExpire={handleCaptchaExpire}
-          />
-        </div>
+        {process.env.NEXT_PUBLIC_NODE_ENV !== 'development' && (
+          <div className="mb-8 flex justify-center">
+            <Turnstile
+              key={activeTab}
+              ref={turnstileRef}
+              onSuccess={handleCaptchaSuccess}
+              onError={handleCaptchaError}
+              onExpire={handleCaptchaExpire}
+            />
+          </div>
+        )}
 
                 {/* Action Buttons */}
         {activeTab === 'signup' ? (

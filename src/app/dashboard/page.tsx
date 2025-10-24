@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { FaFileAlt, FaEdit, FaCog } from 'react-icons/fa'
 import { useRouter } from 'next/navigation'
+import Button from '../../components/Button'
 
 export default function Home() {
   const [selectedType, setSelectedType] = useState<string | null>(null)
@@ -51,15 +52,15 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-medium text-gray-800">Connect your social media accounts</h3>
+      <div className="bg-[#E8E8E8] rounded-lg p-4">
+        <div className="flex flex-col items-center gap-4 md:flex-row md:items-center md:justify-between md:gap-0">
+          <div className="text-center md:text-left">
+            <h3 className="text-md text-gray-800">Connect your social media accounts</h3>
             <p className="text-sm text-gray-500 mt-1">Link your accounts to start posting across platforms</p>
           </div>
-          <button className="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-6 rounded-md transition-colors">
+          <Button onClick={() => router.push('/dashboard/connections')} className="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-6 rounded-md transition-colors w-full md:w-auto">
             Connect Accounts
-          </button>
+          </Button>
         </div>
       </div>
     </div>

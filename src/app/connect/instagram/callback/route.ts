@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       },
       body: new URLSearchParams({
         client_id: process.env.NEXT_PUBLIC_INSTAGRAM_CLIENT_ID!,
-        client_secret: process.env.INSTAGRAM_CLIENT_SECRET!,
+        client_secret: process.env.NEXT_PUBLIC_INSTAGRAM_CLIENT_SECRET!,
         grant_type: 'authorization_code',
         redirect_uri: process.env.NEXT_PUBLIC_INSTAGRAM_REDIRECT_URI!,
         code: code,

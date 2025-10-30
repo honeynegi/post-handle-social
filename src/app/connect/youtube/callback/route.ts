@@ -133,10 +133,9 @@ export async function GET(request: NextRequest) {
 
     // console.log('YouTube connection stored successfully')
     // Redirect to success page
-    return NextResponse.redirect(new URL('https://haddock-special-presently.ngrok-free.app/connect/youtube?success=true', request.url))
-
+    return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_SITE_URL}/connect/youtube?success=true`, request.url))
   } catch (err) {
-    // console.error('Error in YouTube callback:', err)
-    return NextResponse.redirect(new URL('https://haddock-special-presently.ngrok-free.app/connect/youtube?error=unknown', request.url))
+    console.error('Error in Instagram callback:', err)
+    return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_SITE_URL}/connect/youtube?error=unknown`, request.url))
   }
 }

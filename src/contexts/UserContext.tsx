@@ -27,15 +27,15 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const fetchUser = async () => {
     try {
-      const { data: { user }, error } = await supabase.auth.getUser()
+      const { data: { session }, error } = await supabase.auth.getSession()
       if (error) {
-        console.error('Error fetching user:', error)
+        console.error('Error fetching session:', error)
         setUser(null)
         return
       }
-      setUser(user)
+      setUser(session?.user || null)
     } catch (error) {
-      console.error('Error fetching user:', error)
+      console.error('Error fetching session:', error)
       setUser(null)
     }
   }

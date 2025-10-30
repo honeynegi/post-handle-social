@@ -8,5 +8,7 @@ export function createClient() {
     throw new Error('Missing Supabase environment variables. Please check your .env.local file.')
   }
 
-  return createBrowserClient(supabaseUrl, supabaseKey)
+  return createBrowserClient(supabaseUrl, supabaseKey, {
+  global: { headers: { 'x-debug-mode': 'true' } }
+})
 }

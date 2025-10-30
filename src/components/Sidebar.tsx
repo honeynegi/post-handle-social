@@ -55,6 +55,11 @@ const Sidebar = ({ onSettings, onSupport, onClose }: SidebarProps) => {
     }
   }
 
+  const handleLogout = async () => {
+    await logout()
+    onClose?.()
+  }
+
   const isActive = (path: string) => pathname === path
 
   // Close user menu when clicking outside
@@ -260,7 +265,7 @@ const Sidebar = ({ onSettings, onSupport, onClose }: SidebarProps) => {
                 </Button>
                 <Button
                   variant="ghost"
-                  onClick={() => { logout(); onClose?.(); }}
+                  onClick={handleLogout}
                   className="w-full flex justify-start items-center px-4 py-2 text-sm text-gray-700 hover:bg-custom-error/20 transition-colors"
                 >
                   <MdLogout className="mr-3 h-4 w-4" color='#FF5861'/>

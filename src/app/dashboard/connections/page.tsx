@@ -25,6 +25,12 @@ export default function ConnectionsPage() {
   const handleConnect = async (provider: string) => {
     setConnecting(provider)
     try {
+      if (provider === 'google') {
+        // Custom YouTube OAuth flow for upload permissions
+        window.location.href = `/connect/youtube?uid=${Date.now()}`
+        return
+      }
+
       const supabase = createClient()
       const { error } = await supabase.auth.signInWithOAuth({
         provider: provider as any,

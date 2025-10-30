@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       }),
     })
 
-    console.log('Instagram token exchange response status:', tokenResponse.status,  JSON.stringify(tokenResponse))
+    console.log('Instagram token exchange response status:', tokenResponse.status)
 
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text()

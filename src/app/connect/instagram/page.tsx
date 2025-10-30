@@ -30,7 +30,7 @@ function ConnectInstagramContent() {
         throw new Error('Instagram client not configured')
       }
 
-      const instagramAuthUrl = `https://www.instagram.com/oauth/authorize?state=${uid}&force_reauth=true&client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights`
+      const instagramAuthUrl = `https://www.instagram.com/oauth/authorize?force_reauth=true&client_id=833513479113970&redirect_uri=https://post-handle-social.pages.dev/connect/instagram/callback&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights`
 
     //   console.log('Redirecting to Instagram OAuth:', instagramAuthUrl)
       window.location.href = instagramAuthUrl

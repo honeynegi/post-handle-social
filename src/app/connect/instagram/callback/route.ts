@@ -150,9 +150,9 @@ export async function GET(request: NextRequest) {
 
     console.log('Instagram connection stored successfully')
     // Redirect to success page
-    return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_SITE_URL}/connect/instagram?success=true`, request.url))
+    return NextResponse.redirect(new URL(`/connect/instagram?success=true`, request.url))
   } catch (err) {
     console.error('Error in Instagram callback:', err)
-    return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_SITE_URL}/connect/instagram?error=unknown`, request.url))
+    return NextResponse.redirect(new URL(`/connect/instagram?error=unknown`, request.url))
   }
 }

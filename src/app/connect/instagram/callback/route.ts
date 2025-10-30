@@ -40,7 +40,8 @@ export async function GET(request: NextRequest) {
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text()
       console.error('Failed to exchange code for token:', errorText)
-      return NextResponse.redirect(new URL('/connect/instagram?error=token_exchange_failed', request.url))
+
+    //   return NextResponse.redirect(new URL('/connect/instagram?error=token_exchange_failed', request.url))
     }
 
     const tokenData = await tokenResponse.json()

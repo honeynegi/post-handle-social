@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     console.log('Short-lived Instagram access token obtained for user:', user_id)
 
     // Exchange for long-lived token
-    const longLivedTokenResponse = await fetch(`https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${process.env.INSTAGRAM_CLIENT_SECRET}&access_token=${access_token}`, {
+    const longLivedTokenResponse = await fetch(`https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${process.env.NEXT_PUBLIC_INSTAGRAM_CLIENT_SECRET}&access_token=${access_token}`, {
       method: 'GET',
     })
 
@@ -153,7 +153,7 @@ export async function GET(request: NextRequest) {
 
     console.log('Instagram connection stored successfully')
     // Redirect to success page
-    return NextResponse.redirect(new URL(`/connect/instagram?success=true`, request.url))
+    return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_SITE_URL}/connect/instagram?success=true`))
   } catch (err) {
     console.error('Error in Instagram callback:', err)
     // return NextResponse.redirect(new URL(`/connect/instagram?error=unknown`, request.url))

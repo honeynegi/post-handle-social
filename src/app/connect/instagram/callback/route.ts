@@ -123,9 +123,9 @@ export async function GET(request: NextRequest) {
       .from('users')
       .update({
         instagram_user_id: user_id,
-        access_token: access_token,
-        connected_at: new Date().toISOString(),
-        expires_in: longLivedTokenResponse.ok ? longLivedData.expires_in : null,
+        instagram_access_token: access_token,
+        instagram_connected_at: new Date().toISOString(),
+        instagram_expires_in: longLivedTokenResponse.ok ? longLivedData.expires_in : null,
       })
       .eq('uid', dbUser.uid)
 

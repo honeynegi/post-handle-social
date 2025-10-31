@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import Tab from './components/Tab'
 import FlowDiagram from './components/FlowDiagram'
+import DatabaseSchema from './components/DatabaseSchema'
+import DataFlowArchitecture from './components/DataFlowArchitecture'
 import { PLATFORMS } from './data/flowConfig'
 
 export default function HowItWorksPage() {
@@ -148,6 +150,14 @@ export default function HowItWorksPage() {
                 </p>
               </div>
             </div>
+          </div>
+
+          {/* Database Schema Section */}
+          <DatabaseSchema />
+
+          {/* Data Flow Architecture Section */}
+          <div className="mt-12 border-t border-gray-200 dark:border-gray-700 pt-12">
+            <DataFlowArchitecture />
           </div>
         </div>
       </div>

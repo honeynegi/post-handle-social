@@ -21,6 +21,92 @@ export interface StoredField {
   example?: string
 }
 
+export interface DatabaseColumn {
+  name: string
+  type: string
+  nullable: boolean
+  default?: string
+  description: string
+}
+
+export interface DatabaseSchema {
+  tableName: string
+  description: string
+  columns: DatabaseColumn[]
+  primaryKey: string
+  uniqueConstraints: string[]
+}
+
+export const DATABASE_SCHEMA: DatabaseSchema = {
+  tableName: 'public.users',
+  description: 'Stores user account information and connected social media credentials',
+  columns: [
+    {
+      name: 'uid',
+      type: 'text',
+      nullable: false,
+      description: 'Unique identifier for the user (Primary Key)',
+    },
+    {
+      name: 'created_at',
+      type: 'timestamp with time zone',
+      nullable: false,
+      default: 'now()',
+      description: 'Timestamp when the user account was created',
+    },
+    {
+      name: 'instagram_user_id',
+      type: 'text',
+      nullable: true,
+      description: 'Instagram Business Account ID (from Instagram Graph API)',
+    },
+    {
+      name: 'instagram_access_token',
+      type: 'character varying',
+      nullable: true,
+      description: 'Long-lived access token for Instagram Graph API (encrypted)',
+    },
+    {
+      name: 'instagram_connected_at',
+      type: 'timestamp without time zone',
+      nullable: true,
+      description: 'Timestamp when Instagram account was connected',
+    },
+    {
+      name: 'instagram_expires_in',
+      type: 'numeric',
+      nullable: true,
+      description: 'Token expiration duration in seconds',
+    },
+    {
+      name: 'youtube_access_token',
+      type: 'text',
+      nullable: true,
+      description: 'Access token for YouTube API (expires in ~1 hour, encrypted)',
+    },
+    {
+      name: 'youtube_refresh_token',
+      type: 'text',
+      nullable: true,
+      description: 'Refresh token for YouTube API (can be used to get new access tokens, encrypted)',
+    },
+    {
+      name: 'youtube_token_expires_at',
+      type: 'timestamp with time zone',
+      nullable: true,
+      description: 'Timestamp when YouTube access token expires',
+    },
+    {
+      name: 'youtube_connected_at',
+      type: 'timestamp with time zone',
+      nullable: true,
+      description: 'Timestamp when YouTube account was connected',
+    },
+  ],
+  primaryKey: 'uid',
+  uniqueConstraints: ['uid'],
+}
+
 export const PLATFORMS: Record<string, Platform> = {
   youtube: {
     name: 'YouTube',

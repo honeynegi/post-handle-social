@@ -35,7 +35,7 @@ export async function connectYoutubeUser(uid?: string | null) {
         // User not found, create new user with uid
         const { data: newUser, error: insertError } = await supabase
           .from('users')
-          .insert({ id: uid })
+          .insert({ uid: uid })
           .select()
           .single()
 

@@ -32,12 +32,12 @@ export async function GET(request: NextRequest) {
         client_id: process.env.NEXT_PUBLIC_INSTAGRAM_CLIENT_ID!,
         client_secret: process.env.NEXT_PUBLIC_INSTAGRAM_CLIENT_SECRET!,
         grant_type: 'authorization_code',
-        redirect_uri: 'https://post-handle-social.pages.dev/connect/instagram/callback'!,
+        redirect_uri: process.env.NEXT_PUBLIC_INSTAGRAM_REDIRECT_URI!,
         code: code,
       }),
     })
 
-    console.log('Instagram token exchange response status:', tokenResponse.status)
+    console.log('Instagram token exchange response status:', tokenResponse.status,process.env.NEXT_PUBLIC_INSTAGRAM_REDIRECT_URI)
 
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text()
@@ -156,6 +156,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_SITE_URL}/connect/instagram?success=true`))
   } catch (err) {
     console.error('Error in Instagram callback:', err)
-    // return NextResponse.redirect(new URL(`/connect/instagram?error=unknown`, request.url))
+    return NextResponse.redirect(new URL(`/connect/instagram?error=unknown`, request.url))
   }
 }

@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     const tokenData = await tokenResponse.json()
     let { access_token, user_id } = tokenData
 
-    console.log('Short-lived Instagram access token obtained for user:', user_id)
+    console.log('Short-lived Instagram access token obtained for user:', tokenData)
 
     // Exchange for long-lived token
     const longLivedTokenResponse = await fetch(`https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${process.env.NEXT_PUBLIC_INSTAGRAM_CLIENT_SECRET}&access_token=${access_token}`, {
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
       access_token = longLivedToken
     }
 
-    console.log('Instagram access token obtained for user:', user_id)
+    console.log('Instagram access token obtained for user:', access_token)
 
     // Store the access token in Supabase
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!

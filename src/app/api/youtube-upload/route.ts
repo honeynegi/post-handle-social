@@ -1,8 +1,9 @@
+export const runtime = 'edge';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { google } from 'googleapis';
-import type { youtube_v3 } from 'googleapis';
-import { Readable, PassThrough } from 'stream';
+import { PassThrough } from 'stream';
 
 interface PostData {
   user_id: string;

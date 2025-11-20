@@ -1,9 +1,7 @@
-export const runtime = 'nodejs';
+export const runtime = 'edge';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { google } from 'googleapis';
-import { PassThrough } from 'stream';
 
 interface PostData {
   user_id: string;
@@ -78,52 +76,62 @@ export async function POST(request: NextRequest) {
     }
     const videoBuffer = await videoResponse.arrayBuffer();
 
-    // Initialize YouTube API client
-    const oauth2Client = new google.auth.OAuth2();
-    oauth2Client.setCredentials({
-      access_token: accessToken,
+    // YouTube Resumable Upload Protocol
+    // Step 1: Initiate upload
+    const initiateResponse = await fetch('https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'X-Upload-Content-Type': 'video/mp4',
+        'X-Upload-Content-Length': videoBuffer.byteLength.toString(),
+      },
+      body: JSON.stringify({
+        snippet: {
+          title: postData.title,
+          description: postData.description,
+          tags: postData.tags || [],
+        },
+        status: {
+          privacyStatus: postData.privacy || 'private',
+        },
+      }),
     });
 
-    const youtube = google.youtube({
-      version: 'v3',
-      auth: oauth2Client,
-    });
-
-    // Upload video using YouTube API
-    try {
-      const response = await youtube.videos.insert({
-        part: ['snippet', 'status'],
-        requestBody: {
-          snippet: {
-            title: postData.title,
-            description: postData.description,
-            tags: postData.tags || [],
-          },
-          status: {
-            privacyStatus: postData.privacy || 'private',
-          },
-        },
-        media: {
-          body: (() => {
-            const stream = new PassThrough();
-            stream.end(Buffer.from(videoBuffer));
-            return stream;
-          })(),
-          mimeType: 'video/mp4',
-        },
-      });
-
-      return NextResponse.json({
-        success: true,
-        videoId: response.data.id
-      });
-
-    } catch (uploadError: any) {
-      console.error('YouTube upload error:', uploadError);
-      return NextResponse.json({
-        error: `YouTube upload failed: ${uploadError.message}`
-      }, { status: 400 });
+    if (!initiateResponse.ok) {
+      const errorText = await initiateResponse.text();
+      console.error('Initiate upload failed:', errorText);
+      return NextResponse.json({ error: 'Failed to initiate YouTube upload' }, { status: 400 });
     }
+
+    const uploadUrl = initiateResponse.headers.get('Location');
+    if (!uploadUrl) {
+      return NextResponse.json({ error: 'No upload URL received from YouTube' }, { status: 400 });
+    }
+
+    // Step 2: Upload video data
+    const uploadResponse = await fetch(uploadUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'video/mp4',
+        'Content-Length': videoBuffer.byteLength.toString(),
+      },
+      body: videoBuffer,
+    });
+
+    if (!uploadResponse.ok) {
+      const errorText = await uploadResponse.text();
+      console.error('Video upload failed:', errorText);
+      return NextResponse.json({ error: `YouTube upload failed: ${errorText}` }, { status: 400 });
+    }
+
+    const uploadResult = await uploadResponse.json();
+    const videoId = uploadResult.id;
+
+    return NextResponse.json({
+      success: true,
+      videoId: videoId
+    });
 
   } catch (error) {
     console.error('Error in youtube-upload API route:', error);

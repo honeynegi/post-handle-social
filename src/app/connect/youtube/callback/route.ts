@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     }
 
     const tokenData = await tokenResponse.json()
-    const { access_token, refresh_token, expires_in } = tokenData
+    const { access_token, refresh_token, expires_in, refresh_token_expires_in } = tokenData
 
     // console.log('YouTube access token obtained')
 
@@ -115,11 +115,10 @@ export async function GET(request: NextRequest) {
     const { error: updateUserError } = await supabase
       .from('users')
       .update({
-        youtube_user_id: youtubeUserId,
-        youtube_email: youtubeEmail,
         youtube_access_token: access_token,
         youtube_refresh_token: refresh_token,
         youtube_token_expires_at: expires_in ? new Date(Date.now() + expires_in * 1000).toISOString() : null,
+        youtube_refresh_token_expires_at: refresh_token_expires_in ? new Date(Date.now() + refresh_token_expires_in * 1000).toISOString() : null,
         youtube_connected_at: new Date().toISOString(),
       })
       .eq('uid', dbUser.uid)
